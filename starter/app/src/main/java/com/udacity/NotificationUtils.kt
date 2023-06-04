@@ -9,13 +9,22 @@ import androidx.core.app.NotificationCompat
 private const val NOTIFICATION_ID = 0
 
 fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
-    val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+    val contentIntent = Intent(applicationContext, MainActivity::class.java)
     val contentPendingIntent = PendingIntent.getActivity(
         applicationContext,
         NOTIFICATION_ID,
         contentIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     )
+
+    val detailsIntent = Intent(applicationContext, DetailActivity::class.java)
+    val detailsPendingIntent: PendingIntent = PendingIntent.getActivity(
+        applicationContext,
+        NOTIFICATION_ID,
+        detailsIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
     val builder = NotificationCompat.Builder(
         applicationContext,
         applicationContext.getString(R.string.load_app_notification_channel_id)
@@ -24,6 +33,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setContentText(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
         .setContentIntent(contentPendingIntent)
+        .addAction(-1, applicationContext.getString(R.string.load_app_notification_channel_action), detailsPendingIntent)
         .setAutoCancel(true)
 
     notify(NOTIFICATION_ID, builder.build())

@@ -6,6 +6,7 @@
     <string name="load_app_notification_channel_id">downloads</string>
     <string name="load_app_notification_channel_name">Downloads</string>
     <string name="load_app_notification_channel_description">Downloads</string>
+    <string name="load_app_notification_channel_action">Check the status</string>
 
     <string name="notification_title">Udacity: Android Kotlin Nanodegree </string>
     <string name="notification_description">The Project 3 repository is downloaded</string>
