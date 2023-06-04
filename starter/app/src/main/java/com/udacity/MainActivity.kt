@@ -42,14 +42,17 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.load_app_notification_channel_name)
         )
         custom_button.setOnClickListener {
-//            download()
-            notificationManager.sendNotification(getString(R.string.notification_description), this)
+            download()
         }
     }
 
     private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            notificationManager.sendNotification(
+                getString(R.string.notification_description),
+                context
+            )
         }
     }
 
