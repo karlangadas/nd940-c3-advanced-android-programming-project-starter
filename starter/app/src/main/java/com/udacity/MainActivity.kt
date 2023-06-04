@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun download() {
+        notificationManager.cancelNotifications()
         val request =
             DownloadManager.Request(Uri.parse(URL))
                 .setTitle(getString(R.string.app_name))
