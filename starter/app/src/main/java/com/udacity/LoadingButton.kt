@@ -82,6 +82,7 @@ class LoadingButton @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun performClick(): Boolean {
+        if (!super.performClick()) return false
         buttonState = buttonState.next()
         return true
     }

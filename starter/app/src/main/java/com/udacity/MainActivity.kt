@@ -12,11 +12,15 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import kotlinx.android.synthetic.main.content_main.custom_button
+import kotlinx.android.synthetic.main.content_main.download_options
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,26 +46,49 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.load_app_notification_channel_name)
         )
         custom_button.setOnClickListener {
-            download()
+            val radioButton: View? =
+                download_options.findViewById(download_options.checkedRadioButtonId)
+            if (radioButton == null) {
+                Toast.makeText(
+                    applicationContext,
+                    "Please select the file to download",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            download(download_options.indexOfChild(radioButton))
         }
     }
 
+    // adapted from https://stackoverflow.com/questions/32309637/set-extras-for-downloadmanagers-broadcastreceiver
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
-            val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-            notificationManager.sendNotification(
-                getString(R.string.notification_description),
-                context
-            )
+            val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: -1
+            val query = DownloadManager.Query()
+            query.setFilterById(downloadId)
+            val cursor =
+                (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager).query(query)
+            if (cursor.moveToFirst()) {
+                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    val fileName =
+                        cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_DESCRIPTION))
+                    notificationManager.sendNotification(
+                        getString(R.string.notification_description),
+                        context,
+                        fileName
+                    )
+                }
+            }
         }
     }
 
-    private fun download() {
+    private fun download(selectedIndex: Int) {
         notificationManager.cancelNotifications()
         val request =
-            DownloadManager.Request(Uri.parse(URL))
+            DownloadManager.Request(Uri.parse(URLS[selectedIndex]))
                 .setTitle(getString(R.string.app_name))
-                .setDescription(getString(R.string.app_description))
+                .setDescription(REPO_NAMES[selectedIndex])
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
@@ -97,8 +124,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val URL =
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
+        private val URLS =
+            listOf(
+                "https://github.com/bumptech/glide/archive/master.zip",
+                "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip",
+                "https://github.com/square/retrofit/archive/master.zip"
+            )
+        private val REPO_NAMES =
+            listOf(
+                "Glide - Image Loading Library by BumpTech",
+                "ND940 C3 - Starter project repo for C3 by Udacity",
+                "Retrofit - A type-safe HTTP client for Android and the JVM by Square"
+            )
     }
 
 }

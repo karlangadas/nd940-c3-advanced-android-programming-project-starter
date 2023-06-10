@@ -8,7 +8,11 @@ import androidx.core.app.NotificationCompat
 
 private const val NOTIFICATION_ID = 0
 
-fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
+fun NotificationManager.sendNotification(
+    messageBody: String,
+    applicationContext: Context,
+    fileName: String
+) {
     val contentIntent = Intent(applicationContext, MainActivity::class.java)
     val contentPendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -17,7 +21,9 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         PendingIntent.FLAG_UPDATE_CURRENT
     )
 
-    val detailsIntent = Intent(applicationContext, DetailActivity::class.java)
+    val detailsIntent = Intent(applicationContext, DetailActivity::class.java).apply {
+        putExtra(DetailActivity.FILE_NAME_EXTRA, fileName)
+    }
     val detailsPendingIntent: PendingIntent = PendingIntent.getActivity(
         applicationContext,
         NOTIFICATION_ID,
@@ -30,10 +36,14 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         applicationContext.getString(R.string.load_app_notification_channel_id)
     )
         .setSmallIcon(R.drawable.ic_assistant_black_24dp)
-        .setContentText(applicationContext.getString(R.string.notification_title))
+        .setContentTitle(applicationContext.getString(R.string.notification_title))
         .setContentText(messageBody)
         .setContentIntent(contentPendingIntent)
-        .addAction(-1, applicationContext.getString(R.string.load_app_notification_channel_action), detailsPendingIntent)
+        .addAction(
+            -1,
+            applicationContext.getString(R.string.load_app_notification_channel_action),
+            detailsPendingIntent
+        )
         .setAutoCancel(true)
 
     notify(NOTIFICATION_ID, builder.build())
