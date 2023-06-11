@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="LoadingButton">
+        <attr name="downloadBackgroundColor" format="color" />
+        <attr name="downloadingBackgroundColor" format="color" />
+        <attr name="textColor" format="color" />
+        <attr name="downloadingCircleBackgroundColor" format="color" />
     </declare-styleable>
 </resources>

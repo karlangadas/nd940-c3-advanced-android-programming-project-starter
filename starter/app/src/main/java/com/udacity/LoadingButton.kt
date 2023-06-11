@@ -4,12 +4,11 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -18,6 +17,12 @@ class LoadingButton @JvmOverloads constructor(
     private var widthSize = 0
     private var heightSize = 0
     private var buttonTextResId = R.string.button_download
+
+    private var downloadBackgroundColor = 0
+    private var downloadingBackgroundColor = 0
+    private var textColor = 0
+    private var downloadingCircleBackgroundColor = 0
+
 
     private val valueAnimator = ValueAnimator()
 
@@ -45,17 +50,29 @@ class LoadingButton @JvmOverloads constructor(
     init {
         buttonState = ButtonState.Completed
         isClickable = true
+        context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
+            downloadBackgroundColor = getColor(R.styleable.LoadingButton_downloadBackgroundColor, 0)
+            downloadingBackgroundColor =
+                getColor(R.styleable.LoadingButton_downloadingBackgroundColor, 0)
+            textColor = getColor(R.styleable.LoadingButton_textColor, 0)
+            downloadingCircleBackgroundColor =
+                getColor(R.styleable.LoadingButton_downloadingCircleBackgroundColor, 0)
+        }
+        setBackgroundColor(downloadBackgroundColor)
     }
 
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        paint.color = Color.WHITE
+        paint.color = textColor
+        // positioning logic from https://stackoverflow.com/questions/11120392/android-center-text-on-canvas
+        val xPos = width / 2f
+        val yPos = (height / 2 - (paint.descent() + paint.ascent()) / 2)
         canvas.drawText(
             resources.getString(buttonTextResId),
-            (width * 1f) / 2,
-            (height * 1f) / 2,
+            xPos,
+            yPos,
             paint
         )
     }
