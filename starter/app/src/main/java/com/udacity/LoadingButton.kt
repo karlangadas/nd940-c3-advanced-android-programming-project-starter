@@ -87,7 +87,7 @@ class LoadingButton @JvmOverloads constructor(
         }
         setBackgroundColor(downloadBackgroundColor)
         progressAnimator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 loadingAngle = 0f
                 loadingProgress = 0f
                 buttonState = buttonState.next()

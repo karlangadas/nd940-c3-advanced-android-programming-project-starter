@@ -18,9 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_main.toolbar
-import kotlinx.android.synthetic.main.content_main.custom_button
-import kotlinx.android.synthetic.main.content_main.download_options
+import com.udacity.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
@@ -48,9 +46,9 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.load_app_notification_channel_id),
             getString(R.string.load_app_notification_channel_name)
         )
-        custom_button.setOnClickListener {
+        binding.contentMain.customButton.setOnClickListener {
             val radioButton: View? =
-                download_options.findViewById(download_options.checkedRadioButtonId)
+                binding.contentMain.downloadOptions.findViewById(binding.contentMain.downloadOptions.checkedRadioButtonId)
             if (radioButton == null) {
                 Toast.makeText(
                     applicationContext,
@@ -59,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 ).show()
                 return@setOnClickListener
             }
-            download(download_options.indexOfChild(radioButton))
+            download(binding.contentMain.downloadOptions.indexOfChild(radioButton))
         }
     }
 
