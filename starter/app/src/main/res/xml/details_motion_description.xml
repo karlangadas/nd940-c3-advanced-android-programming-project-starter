@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<MotionScene xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/motion_layout">
+  <Transition
+    app:constraintSetStart="@+id/start"
+    app:constraintSetEnd="@+id/end"
+    app:duration="700">
+    <OnClick
+      app:targetId="@+id/status"
+      app:clickAction="transitionToEnd"
+      />
+    <KeyFrameSet>
+      <KeyAttribute
+        app:framePosition="100"
+        app:motionTarget="@id/cloud"
+        android:alpha="0.0"
+        />
+      <KeyAttribute
+        app:framePosition="100"
+        app:motionTarget="@id/cloud">
+        <CustomAttribute
+          app:attributeName="colorFilter"
+          app:customColorValue="#123456"
+          />
+      </KeyAttribute>
+      <KeyAttribute
+        app:framePosition="50"
+        app:motionTarget="@id/cloud">
+        <CustomAttribute
+          app:attributeName="colorFilter"
+          app:customColorValue="#9C27B0"
+          />
+      </KeyAttribute>
+      <KeyAttribute
+        app:framePosition="50"
+        app:motionTarget="@id/cloud"
+        android:scaleY="2.0"
+        android:scaleX="2.0"
+        android:rotation="180"
+        />
+      <KeyAttribute
+        app:framePosition="100"
+        app:motionTarget="@id/cloud"
+        android:rotation="360"
+        />
+    </KeyFrameSet>
+  </Transition>
+
+  <!-- Constraints to apply at the start of the animation -->
+  <ConstraintSet android:id="@+id/start">
+    <Constraint
+      android:id="@id/cloud"
+      android:layout_width="match_parent"
+      android:layout_height="100dp"
+      app:layout_constraintTop_toBottomOf="@+id/status"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      />
+  </ConstraintSet>
+
+  <!-- Constraints to apply at the end of the animation -->
+  <ConstraintSet android:id="@+id/end">
+    <Constraint
+      android:id="@id/cloud"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      />
+  </ConstraintSet>
+</MotionScene>
