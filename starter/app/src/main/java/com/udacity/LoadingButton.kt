@@ -13,10 +13,7 @@ import android.view.View
 import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 import android.graphics.RectF
-import android.util.Log
 import android.view.animation.AccelerateInterpolator
-import android.view.animation.Animation
-import kotlinx.android.synthetic.main.content_detail.view.status_description
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -25,22 +22,27 @@ class LoadingButton @JvmOverloads constructor(
     private var heightSize = 0
     private var buttonTextResId = R.string.button_download
 
+    // custom attributes
     private var downloadBackgroundColor = 0
     private var downloadingBackgroundColor = 0
     private var textColor = 0
     private var downloadingCircleBackgroundColor = 0
 
+    // draw attributes
     private var textXPos = 0f
     private var textYPos = 0f
+
+    // animation attributes
     private val circleRect: RectF = RectF(0f, 0f, 0f, 0f)
-    private val animDuration = 3000L
+    private val animDuration = 2500L
     private var loadingAngle = 0f
-    private val
-            circleAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+    private var loadingProgress = 0f
+    private val progressAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
         duration = animDuration
         interpolator = AccelerateInterpolator(1f)
         addUpdateListener {
             loadingAngle = animatedValue as Float
+            loadingProgress = animatedValue as Float / 360f
             invalidate()
         }
     }
@@ -67,8 +69,8 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private fun startAnimation() {
-        circleAnimator?.cancel()
-        circleAnimator?.start()
+        progressAnimator?.cancel()
+        progressAnimator?.start()
     }
 
 
@@ -84,9 +86,10 @@ class LoadingButton @JvmOverloads constructor(
                 getColor(R.styleable.LoadingButton_downloadingCircleBackgroundColor, 0)
         }
         setBackgroundColor(downloadBackgroundColor)
-        circleAnimator.addListener(object : AnimatorListenerAdapter() {
+        progressAnimator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 loadingAngle = 0f
+                loadingProgress = 0f
                 buttonState = buttonState.next()
             }
         })
@@ -95,20 +98,33 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        paint.color = textColor
-        canvas.drawText(
-            resources.getString(buttonTextResId),
-            textXPos,
-            textYPos,
+
+        // progress rect
+        paint.color = downloadingBackgroundColor
+        canvas.drawRect(
+            0f,
+            0f,
+            width.toFloat() * loadingProgress,
+            height.toFloat(),
             paint
         )
 
+        // progress circle
         paint.color = downloadingCircleBackgroundColor
         canvas.drawArc(
             circleRect,
             0f,
             loadingAngle,
             true,
+            paint
+        )
+
+        // text
+        paint.color = textColor
+        canvas.drawText(
+            resources.getString(buttonTextResId),
+            textXPos,
+            textYPos,
             paint
         )
     }
