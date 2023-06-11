@@ -43,5 +43,4 @@ class DetailActivity : AppCompatActivity() {
                 motionLayout.transitionToEnd()
         }
     }
-
 }

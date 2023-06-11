@@ -25,6 +25,8 @@ import kotlinx.android.synthetic.main.content_main.download_options
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     private var downloadID: Long = 0
 
     private lateinit var notificationManager: NotificationManager
@@ -33,8 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         notificationManager = ContextCompat.getSystemService(
@@ -137,5 +140,4 @@ class MainActivity : AppCompatActivity() {
                 "Retrofit - A type-safe HTTP client for Android and the JVM by Square"
             )
     }
-
 }
