@@ -1,5 +1,7 @@
 package com.udacity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,6 +12,11 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
+import android.graphics.RectF
+import android.util.Log
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
+import kotlinx.android.synthetic.main.content_detail.view.status_description
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -23,8 +30,20 @@ class LoadingButton @JvmOverloads constructor(
     private var textColor = 0
     private var downloadingCircleBackgroundColor = 0
 
-
-    private val valueAnimator = ValueAnimator()
+    private var textXPos = 0f
+    private var textYPos = 0f
+    private val circleRect: RectF = RectF(0f, 0f, 0f, 0f)
+    private val animDuration = 3000L
+    private var loadingAngle = 0f
+    private val
+            circleAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+        duration = animDuration
+        interpolator = AccelerateInterpolator(1f)
+        addUpdateListener {
+            loadingAngle = animatedValue as Float
+            invalidate()
+        }
+    }
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
         when (new) {
@@ -36,14 +55,20 @@ class LoadingButton @JvmOverloads constructor(
             ButtonState.Loading -> {
                 buttonTextResId = R.string.button_loading
                 contentDescription = resources.getString(R.string.button_loading)
+                startAnimation()
             }
 
-            else -> {
+            ButtonState.Completed -> {
                 buttonTextResId = R.string.button_download
                 contentDescription = resources.getString(R.string.button_download)
             }
         }
         invalidate()
+    }
+
+    private fun startAnimation() {
+        circleAnimator?.cancel()
+        circleAnimator?.start()
     }
 
 
@@ -59,20 +84,31 @@ class LoadingButton @JvmOverloads constructor(
                 getColor(R.styleable.LoadingButton_downloadingCircleBackgroundColor, 0)
         }
         setBackgroundColor(downloadBackgroundColor)
+        circleAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                loadingAngle = 0f
+                buttonState = buttonState.next()
+            }
+        })
     }
 
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         paint.color = textColor
-        // positioning logic from https://stackoverflow.com/questions/11120392/android-center-text-on-canvas
-        val xPos = width / 2f
-        val yPos = (height / 2 - (paint.descent() + paint.ascent()) / 2)
         canvas.drawText(
             resources.getString(buttonTextResId),
-            xPos,
-            yPos,
+            textXPos,
+            textYPos,
+            paint
+        )
+
+        paint.color = downloadingCircleBackgroundColor
+        canvas.drawArc(
+            circleRect,
+            0f,
+            loadingAngle,
+            true,
             paint
         )
     }
@@ -104,4 +140,19 @@ class LoadingButton @JvmOverloads constructor(
         return true
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        // positioning logic from https://stackoverflow.com/questions/11120392/android-center-text-on-canvas
+        textXPos = width / 2f
+        textYPos = (height / 2 - (paint.descent() + paint.ascent()) / 2)
+        val circleXPos = width * 5f / 7f
+        val circleYPos = height / 3f
+        val circleDiameter = height / 3f
+        circleRect.set(
+            circleXPos,
+            circleYPos,
+            circleXPos + circleDiameter,
+            circleYPos + circleDiameter
+        )
+    }
 }
