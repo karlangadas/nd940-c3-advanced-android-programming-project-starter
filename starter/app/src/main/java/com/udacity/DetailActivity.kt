@@ -39,7 +39,7 @@ class DetailActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         binding.contentDetail.fileName.text = intent.getStringExtra(FILE_NAME_EXTRA) ?: ""
-        motionLayout = findViewById(R.id.contraint_layout)
+        motionLayout = binding.contentDetail.contraintLayout
         motionLayout.setTransitionListener(motionLayoutListener)
         binding.okButton.setOnClickListener {
             if (motionLayout.progress == 0.0f)

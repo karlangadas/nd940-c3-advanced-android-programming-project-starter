@@ -14,6 +14,7 @@ import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 import android.graphics.RectF
 import android.view.animation.AccelerateInterpolator
+import android.view.animation.Animation
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -39,6 +40,7 @@ class LoadingButton @JvmOverloads constructor(
     private var loadingProgress = 0f
     private val progressAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
         duration = animDuration
+        repeatCount = Animation.INFINITE
         interpolator = AccelerateInterpolator(1f)
         addUpdateListener {
             loadingAngle = animatedValue as Float
@@ -47,7 +49,7 @@ class LoadingButton @JvmOverloads constructor(
         }
     }
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
+    internal var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { _, _, new ->
         when (new) {
             ButtonState.Clicked -> {
                 // trigger animation
@@ -63,6 +65,7 @@ class LoadingButton @JvmOverloads constructor(
             ButtonState.Completed -> {
                 buttonTextResId = R.string.button_download
                 contentDescription = resources.getString(R.string.button_download)
+                cancelAnimation()
             }
         }
         invalidate()
@@ -71,6 +74,10 @@ class LoadingButton @JvmOverloads constructor(
     private fun startAnimation() {
         progressAnimator?.cancel()
         progressAnimator?.start()
+    }
+
+    private fun cancelAnimation() {
+        progressAnimator?.cancel()
     }
 
 
@@ -90,7 +97,6 @@ class LoadingButton @JvmOverloads constructor(
             override fun onAnimationEnd(animation: Animator) {
                 loadingAngle = 0f
                 loadingProgress = 0f
-                buttonState = buttonState.next()
             }
         })
     }

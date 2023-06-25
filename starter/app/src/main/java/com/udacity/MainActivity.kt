@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -63,7 +64,9 @@ class MainActivity : AppCompatActivity() {
 
     // adapted from https://stackoverflow.com/questions/32309637/set-extras-for-downloadmanagers-broadcastreceiver
     private val receiver = object : BroadcastReceiver() {
+        @SuppressLint("Range")
         override fun onReceive(context: Context, intent: Intent?) {
+            binding.contentMain.customButton.apply { buttonState = ButtonState.Completed }
             val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) ?: -1
             val query = DownloadManager.Query()
             query.setFilterById(downloadId)
